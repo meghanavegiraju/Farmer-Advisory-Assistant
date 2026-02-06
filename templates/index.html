@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Farmer Advisory Assistant</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-green-50 text-gray-800 font-sans min-h-screen flex items-center justify-center p-6">
+
+<div class="max-w-xl w-full bg-white rounded-xl shadow-lg p-6">
+
+<h1 class="text-3xl font-bold mb-4 text-green-700 text-center">
+🌾 Farmer Advisory Assistant
+</h1>
+
+<p class="text-center text-gray-600 mb-6">
+Ask farming questions by typing or speaking
+</p>
+
+<!-- TEXT INPUT -->
+<form id="textForm" class="flex gap-2 mb-6">
+<input
+type="text"
+id="textInput"
+class="flex-1 border border-gray-300 rounded-lg px-4 py-2"
+placeholder="Type your question..."
+/>
+
+<button type="submit"
+class="bg-green-600 text-white px-4 py-2 rounded-lg">
+Ask
+</button>
+</form>
+
+<!-- MIC BUTTON -->
+<button id="recordBtn"
+class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 w-full">
+🎤 Start Recording
+</button>
+
+<!-- RESULT -->
+<div id="result"
+class="bg-gray-100 p-4 rounded-lg shadow-inner mt-6 hidden">
+
+<h2 class="font-semibold text-lg text-green-800 mb-2">
+📝 Answer:
+</h2>
+
+<p id="responseText"
+class="text-gray-700 mb-3 whitespace-pre-wrap"></p>
+
+<audio id="audioPlayer" controls class="w-full hidden"></audio>
+
+</div>
+
+</div>
+
+<script>
+
+// ---------- TEXT SUBMIT ----------
+document.getElementById('textForm').addEventListener('submit', async (e) => {
+
+e.preventDefault();
+
+const text = document.getElementById('textInput').value.trim();
+if (!text) return;
+
+const formData = new FormData();
+formData.append('text', text);
+
+const res = await fetch('/chat', { method:'POST', body:formData });
+const data = await res.json();
+
+showResponse(data.text, data.voice);
+
+});
+
+
+// ---------- VOICE RECORDER ----------
+document.addEventListener("DOMContentLoaded", () => {
+
+let mediaRecorder;
+let audioChunks = [];
+
+const recordBtn = document.getElementById("recordBtn");
+
+recordBtn.addEventListener("click", async () => {
+
+try {
+
+if (!mediaRecorder || mediaRecorder.state === "inactive") {
+
+const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+
+mediaRecorder = new MediaRecorder(stream);
+mediaRecorder.start();
+
+audioChunks = [];
+
+mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+
+recordBtn.innerText = "⏹ Stop Recording";
+
+mediaRecorder.onstop = async () => {
+
+const audioBlob = new Blob(audioChunks, { type:"audio/webm" });
+
+const formData = new FormData();
+formData.append("audio", audioBlob, "recording.webm");
+
+const res = await fetch("/chat", { method:"POST", body:formData });
+const data = await res.json();
+
+showResponse(data.text, data.voice);
+
+};
+
+}
+else {
+
+mediaRecorder.stop();
+recordBtn.innerText = "🎤 Start Recording";
+
+}
+
+}
+catch(err){
+alert("Microphone permission denied.");
+}
+
+});
+
+});
+
+
+// ---------- SHOW RESPONSE ----------
+function showResponse(text, voiceUrl){
+
+const resultDiv = document.getElementById('result');
+const responseText = document.getElementById('responseText');
+const audioPlayer = document.getElementById('audioPlayer');
+
+responseText.textContent = text;
+resultDiv.classList.remove('hidden');
+
+if (voiceUrl){
+audioPlayer.src = voiceUrl;
+audioPlayer.classList.remove('hidden');
+audioPlayer.load();
+}
+else{
+audioPlayer.classList.add('hidden');
+}
+
+}
+
+</script>
+
+</body>
+</html>
