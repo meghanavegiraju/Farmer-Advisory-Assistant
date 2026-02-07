@@ -24,18 +24,16 @@ def format_response(answer):
     return "\n".join(cleaned_lines)
 
 # ✅ Use environment variable (SECURE)
-groq_client = Groq(api_key="YOUR_GROQ_API_KEY")
+groq_client = Groq(api_key="")
 
-
-# ✅ Agriculture keywords
 agri_keywords = [
-    "crop", "farming", "fertilizer", "soil", "irrigation",
-    "rain", "weather", "harvest", "seed", "agriculture",
-    "farmer", "pesticide", "plant", "yield",
-    "rice", "wheat", "maize", "cotton", "barley",
-    "crop production", "farming state", "agriculture state"
+    "agriculture", "farmer", "farming",
+    "crop", "crops", "cultivation",
+    "soil", "fertilizer", "manure",
+    "irrigation", "rain", "weather",
+    "harvest", "yield", "seed", "seeds",
+    "pesticide", "plant", "plants"
 ]
-
 
 
 def is_agriculture_question(question):
@@ -43,6 +41,7 @@ def is_agriculture_question(question):
     return any(word in question for word in agri_keywords)
 
 
+# ------------------ AUDIO TO TEXT ------------------
 def transcribe_audio(filepath):
     with open(filepath, "rb") as f:
         response = groq_client.audio.transcriptions.create(
@@ -52,19 +51,31 @@ def transcribe_audio(filepath):
     return response.text
 
 
+# ------------------ GET ANSWER ------------------
 def get_answer(question):
 
-    # ✅ Filter non agriculture questions
+    # 🚫 STRICT BLOCK for non-agriculture
     if not is_agriculture_question(question):
-        return "I am designed to answer agriculture-related questions. Please ask about crops, fertilizers, irrigation, or farming."
+        return (
+            "I am a farmer advisory assistant. "
+            "I can answer only agriculture-related questions such as "
+            "crops, soil, irrigation, and farming practices."
+        )
 
-    # ✅ Send valid questions to Groq
+    # ✅ ONLY agriculture questions reach the LLM
     response = groq_client.chat.completions.create(
         model="llama-3.1-8b-instant",
+        max_tokens=150,
         messages=[
-            {"role": "system", "content": "You are a helpful agriculture chatbot for Indian farmers."
-             " Give short, simple, and practical answers."
-              "Focus only on agriculture-related guidance."},
+            {
+                "role": "system",
+                "content": (
+                    "You are a farmer advisory assistant. "
+                    "Answer ONLY agriculture-related questions. "
+                    "Give short, simple, practical answers. "
+                    "Do NOT answer any other topics."
+                )
+            },
             {"role": "user", "content": question}
         ]
     )
@@ -72,6 +83,7 @@ def get_answer(question):
     return response.choices[0].message.content
 
 
+# ------------------ TYPING EFFECT ------------------
 def typing_effect(text, delay=0.03):
     for char in text:
         print(char, end='', flush=True)
@@ -79,6 +91,7 @@ def typing_effect(text, delay=0.03):
     print()
 
 
+# ------------------ TEXT TO SPEECH ------------------
 def text_to_speech(text, filename):
     tts = gTTS(text)
     output_path = f"{filename}.mp3"
@@ -86,6 +99,7 @@ def text_to_speech(text, filename):
     return output_path
 
 
+# ------------------ MAIN FUNCTION ------------------
 def main():
 
     mode = input("Choose input type ('text' or 'audio'): ").strip().lower()
