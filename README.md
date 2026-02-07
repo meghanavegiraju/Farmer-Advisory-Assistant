@@ -25,30 +25,50 @@ https://drive.google.com/file/d/1D-YlGwue4foSNCqPqrH_lr1S0njkf_0o/view?usp=shari
 **Conversation Flow**
 
 User
+
 ↓
+
 Text / Voice Input
+
 ↓
+
 Speech-to-Text (for voice queries)
+
 ↓
+
 Conversation Context Handling
+
 ↓
+
 Agriculture Domain Validation
+
 ↓
+
 LLM Processing (Groq LLaMA)
+
 ↓
+
 Response Generation
+
 ↓
+
 Text-to-Speech Conversion
+
 ↓
+
 Text + Audio Response
+
 ↓
+
 Follow-up Question Support
 
 **Sample Dialogues**
 
 
 **Dialogue 1 – Agriculture Query**
+
 **User:** How to grow sugarcane?
+
 **Bot:**
 Here are 4 steps to grow sugarcane:
  • Planting: Plant sugarcane cuttings in a well-prepared soil bed, typically in the rainy season. 
@@ -59,7 +79,9 @@ Here are 4 steps to grow sugarcane:
 
 
 **Dialogue 2 – Follow-Up Question**
+
 **User:** How much water does it need?
+
 **Bot:**
 Here are 4 key facts about water requirements for sugarcane:
  • Average of 2,000-3,000 mm: Sugarcane needs an average of 2,000-3,000 mm of water per year.
@@ -69,7 +91,9 @@ Here are 4 key facts about water requirements for sugarcane:
 
  
 **Dialogue 3 – Voice Interaction**
+
 **User (Voice):** Which states grow rice in India?
+
 **Bot:**
 •	West Bengal
 •	Punjab
