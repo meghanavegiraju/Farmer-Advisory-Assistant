@@ -66,6 +66,3 @@
 27. How can AI help Indian farmers?
 28. What mobile apps help with pest detection?
 
----
-
-Let me know if you want these in **Hindi or Bengali**, or need **expected answers** for test automation.
