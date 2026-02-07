@@ -106,7 +106,6 @@ def main():
 
     if mode == 'text':
         question = input("Enter your question: ").strip()
-
     elif mode == 'audio':
         filepath = input("Enter the path to your audio file: ").strip()
 
